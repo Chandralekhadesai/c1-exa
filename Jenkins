@@ -1,0 +1,49 @@
+pipeline {
+    agent any
+   
+    stages {
+        stage ('SCM ') {
+            steps {
+            git branch: 'main', url: 'https://github.com/Chandralekhadesai/c1-exa.git'
+            }
+               
+        }
+        stage ('docker image build') {
+            steps {
+            sh '/usr/bin/docker image build -t  lekha19/test1 .'
+            }
+        }
+        stage ('docker login') {
+            steps {
+                sh 'echo dckr_pat_wNpF2jigUnpMd5mXHDSwCbrxj4g | sudo  docker login -u lekha19 --password-stdin'
+            }
+        }
+        stage ('docker image push') {
+            steps {
+                sh '/usr/bin/docker  image push lekha19/test1'
+            }
+        }
+        stage ('get the confirmation') {
+            steps {
+                input 'Do you want to Deploy ?'
+            }
+        }
+        stage ('Confirm') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Chandralekhadesai/c1-exa.git'
+            }
+        }
+        stage ('Remove Existing Service') {
+            steps {
+                sh '/usr/bin/docker service rm serv1'
+            }
+        }
+        stage ('create docker servcie') {
+            steps {
+                sh '/usr/bin/docker service create --name serv1 -p 4000:4000 lekha19/test1 '
+            }
+        }
+       
+    }
+}
+
